@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'screens/onboarding_screen.dart'; // استيراد شاشة الترحيب
+import 'screens/home_screen.dart';
+import 'screens/onboarding_screen.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -13,10 +19,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: OnboardingScreen(), // استدعاء الكلاس الفعلي لشاشة الترحيب
+      home: OnboardingScreen(), // Start with OnboardingScreen
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
+        '/home': (context) => HomeScreen(), // Define your home screen route
       },
     );
   }

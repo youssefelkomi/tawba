@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "554705705245",
+    "project_id": "tawba-6e3ea",
+    "storage_bucket": "tawba-6e3ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:554705705245:android:74d7428105a5a5af2da9f4",
+        "android_client_info": {
+          "package_name": "com.example.tawba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqlwIaBxDP-pzOIgvi3csjr5efQtKu3lA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

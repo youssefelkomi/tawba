@@ -17,7 +17,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     for (int i = 0; i < _numPages; i++) {
       list.add(i == _currentPage
           ? _indicator(false)
-          : _indicator(true)); // عكس التنقل
+          : _indicator(true));
     }
     return list;
   }

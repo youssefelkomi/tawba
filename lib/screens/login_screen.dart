@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -7,7 +8,29 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
+  String _email = '';
+  String _password = '';
   bool _rememberMe = false;
+
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      try {
+        final user = await _auth.signInWithEmailAndPassword(
+          email: _email,
+          password: _password,
+        );
+        if (user != null) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
   Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               fontFamily: 'Changa',
@@ -54,6 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: Colors.white54,
               ),
             ),
+            validator: (value) => value!.isEmpty ? 'الرجاء إدخال البريد الإلكتروني' : null,
+            onSaved: (value) => _email = value!,
           ),
         ),
       ],
@@ -87,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
             obscureText: true,
             style: TextStyle(
               fontFamily: 'Changa',
@@ -106,6 +131,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: Colors.white54,
               ),
             ),
+            validator: (value) => value!.isEmpty ? 'الرجاء إدخال كلمة المرور' : null,
+            onSaved: (value) => _password = value!,
           ),
         ),
       ],
@@ -167,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () => print('تم الضغط على زر تسجيل الدخول'),
+        onPressed: _login,
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
@@ -261,7 +288,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildSignupBtn() {
     return GestureDetector(
       onTap: () {
-        // انتقل إلى صفحة التسجيل عند النقر على الزر
         Navigator.pushReplacementNamed(context, '/register');
       },
       child: RichText(
@@ -310,10 +336,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                      Color(0xFF73AEF5),
-                      Color(0xFF61A4F1),
-                      Color(0xFF478DE0),
-                      Color(0xFF398AE5),
+                        Color(0xFF73AEF5),
+                        Color(0xFF61A4F1),
+                        Color(0xFF478DE0),
+                        Color(0xFF398AE5),
                       ],
                       stops: [0.1, 0.4, 0.7, 0.9],
                     ),
@@ -340,16 +366,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(height: 30.0),
-                        _buildEmailTF(),
-                        SizedBox(height: 30.0),
-                        _buildPasswordTF(),
-                        _buildForgotPasswordBtn(),
-                        SizedBox(height: 20.0), // تعديل: إضافة تباعد هنا
-                        _buildRememberMeCheckbox(),
-                        _buildLoginBtn(),
-                        _buildSignInWithText(),
-                        _buildSocialBtnRow(),
-                        _buildSignupBtn(),
+                        Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              _buildEmailTF(),
+                              SizedBox(height: 30.0),
+                              _buildPasswordTF(),
+                              _buildForgotPasswordBtn(),
+                              SizedBox(height: 20.0),
+                              _buildRememberMeCheckbox(),
+                              _buildLoginBtn(),
+                              _buildSignInWithText(),
+                              _buildSocialBtnRow(),
+                              _buildSignupBtn(),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -361,17 +394,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-  FlatButton(
-      {required void Function() onPressed,
-      required EdgeInsets padding,
-      required Text child}) {}
-
-  RaisedButton(
-      {required double elevation,
-      required void Function() onPressed,
-      required EdgeInsets padding,
-      required RoundedRectangleBorder shape,
-      required Color color,
-      required Text child}) {}
+  
+  FlatButton({required void Function() onPressed, required EdgeInsets padding, required Text child}) {}
+  
+  RaisedButton({required double elevation, required void Function() onPressed, required EdgeInsets padding, required RoundedRectangleBorder shape, required Color color, required Text child}) {}
 }

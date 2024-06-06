@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -7,7 +7,29 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
+  String _name = '';
+  String _email = '';
+  String _password = '';
   bool _agreeToTerms = false;
+
+  void _register() async {
+    if (_formKey.currentState!.validate() && _agreeToTerms) {
+      _formKey.currentState!.save();
+      try {
+        final user = await _auth.createUserWithEmailAndPassword(
+          email: _email,
+          password: _password,
+        );
+        if (user != null) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
 
   Widget _buildNameTF() {
     return Column(
@@ -36,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ],
           ),
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.name,
             style: TextStyle(
               fontFamily: 'Changa',
@@ -55,6 +77,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: Colors.white54,
               ),
             ),
+            validator: (value) => value!.isEmpty ? 'الرجاء إدخال الاسم' : null,
+            onSaved: (value) => _name = value!,
           ),
         ),
       ],
@@ -88,7 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ],
           ),
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               fontFamily: 'Changa',
@@ -107,6 +131,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: Colors.white54,
               ),
             ),
+            validator: (value) =>
+                value!.isEmpty ? 'الرجاء إدخال البريد الإلكتروني' : null,
+            onSaved: (value) => _email = value!,
           ),
         ),
       ],
@@ -140,7 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ],
           ),
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
             obscureText: true,
             style: TextStyle(
               fontFamily: 'Changa',
@@ -159,6 +186,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: Colors.white54,
               ),
             ),
+            validator: (value) =>
+                value!.isEmpty ? 'الرجاء إدخال كلمة المرور' : null,
+            onSaved: (value) => _password = value!,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConfirmPasswordTF() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'تأكيد كلمة المرور',
+          style: TextStyle(
+            fontFamily: 'Changa',
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: BoxDecoration(
+            color: Color(0xFF6CA8F1),
+            borderRadius: BorderRadius.circular(10.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6.0,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          height: 60.0,
+          child: TextFormField(
+            obscureText: true,
+            style: TextStyle(
+              fontFamily: 'Changa',
+              color: Colors.white,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              hintText: 'أدخل تأكيد كلمة المرور',
+              hintStyle: TextStyle(
+                fontFamily: 'Changa',
+                color: Colors.white54,
+              ),
+            ),
+            validator: (value) =>
+                value != _password ? 'كلمة المرور غير متطابقة' : null,
           ),
         ),
       ],
@@ -202,7 +286,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () => print('تم الضغط على زر التسجيل'),
+        onPressed: _register,
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
@@ -303,15 +387,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         SizedBox(height: 30.0),
-                        _buildNameTF(),
-                        SizedBox(height: 30.0),
-                        _buildEmailTF(),
-                        SizedBox(height: 30.0),
-                        _buildPasswordTF(),
-                        SizedBox(height: 20.0),
-                        _buildAgreeToTermsCheckbox(),
-                        _buildRegisterBtn(),
-                        _buildLoginLink(),
+                        Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              _buildNameTF(),
+                              SizedBox(height: 30.0),
+                              _buildEmailTF(),
+                              SizedBox(height: 30.0),
+                              _buildPasswordTF(),
+                              SizedBox(height: 30.0),
+                              _buildConfirmPasswordTF(),
+                              SizedBox(height: 20.0),
+                              _buildAgreeToTermsCheckbox(),
+                              _buildRegisterBtn(),
+                              _buildLoginLink(),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -331,4 +424,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       required RoundedRectangleBorder shape,
       required Color color,
       required Text child}) {}
+}
+
+class SystemUiOverlayStyle {
+  static var light;
 }
